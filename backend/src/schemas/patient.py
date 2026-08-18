@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict
 class PatientBase(BaseModel):
     cedula: str
     full_name: str
+    year_old: int
 
 
 class PatientCreate(PatientBase):

@@ -9,6 +9,7 @@ class Patient(Base):
     cedula = Column(String, unique=True, index=True, nullable=False)
     full_name = Column(String, nullable=False)
     doctor_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    year_old = Column(Integer, nullable=False)
 
     # un medico a muchos usuarios
     doctor = relationship("User", back_populates="patients")
