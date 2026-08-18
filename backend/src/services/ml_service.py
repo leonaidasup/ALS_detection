@@ -1,12 +1,10 @@
 from pathlib import Path
 from typing import Any, Dict, Tuple
-import joblib # type: ignore[import-untyped]
+import dill # type: ignore[import-untyped]
 import numpy as np
 import shap # type: ignore[import-untyped]
 
-MODEL_PATH = (
-    Path(__file__).resolve().parent.parent / "ml_models" / "modelo_biomarcadores_v1.joblib"
-)
+MODEL_PATH = Path(__file__).resolve().parent.parent / "ml_models" / "modelo_reglog_v1.pkl"
 
 
 # transformacion de inputs
@@ -27,7 +25,8 @@ class MLService:
         if not self.model_path.exists():
             raise FileNotFoundError(f"No se encontró el archivo del modelo en: {self.model_path}")
 
-        self.artifact = joblib.load(self.model_path)
+        with open(self.model_path, "rb") as f:
+            self.artifact = dill.load(f)
         self.pipeline = self.artifact["pipeline"]
         self.required_variables = self.artifact["variables"]
 
