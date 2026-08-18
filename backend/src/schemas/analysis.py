@@ -11,6 +11,7 @@ class AnalysisBase(BaseModel):
 class AnalysisCreate(AnalysisBase):
     """Esquema al registrar un nuevo analisis"""
     patient_id: int
+    biomarkers: dict[str, float]
     
 
 class AnalysisResponse(AnalysisBase):
@@ -18,10 +19,12 @@ class AnalysisResponse(AnalysisBase):
     id: int
     patient_id: int
     doctor_id: int
-    created_at: datetime
-
+    input_data: dict[str, float]
     prediction: str
     probability: float
-    shap_values: Optional[Dict[str, float]]
+    top_biomarkers: dict[str, float] # 5 biomarcadores ordenados por magnitud de SHAP
+    all_biomarkers: dict[str, float] # biomarcadores ordenados por magnitud de SHAP
+    shap_values: dict[str, float]
+    created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True) 
+    model_config = ConfigDict(from_attributes=True)
