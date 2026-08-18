@@ -13,5 +13,4 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
     # Un medico puede tener muchos pacientes
-    patients = relationship(
-        "Patient", back_populates="doctor")
+    patients = relationship("Patient", back_populates="doctor")

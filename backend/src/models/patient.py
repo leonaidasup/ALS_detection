@@ -15,6 +15,4 @@ class Patient(Base):
     doctor = relationship("User", back_populates="patients")
 
     # un paciente muchos analisis [1: n] ademas eliminamos los analisis si se elimina el paciente
-    analyses = relationship(
-        "Analysis", back_populates="patient", cascade="all, delete-orphan"
-    )
+    analyses = relationship("Analysis", back_populates="patient", cascade="all, delete-orphan")
