@@ -4,11 +4,11 @@ from src.config import settings
 
 engine = create_engine(
     settings.DATABASE_URL,
-    pool_pre_ping=True,       # Verifica la conexion
-    pool_size=5,              # Conexiones persistentes a mantener por instancia/contenedor
-    max_overflow=10,          # Conexiones adicionales temporales durante picos de trafico
-    pool_recycle=900,         # Reinicia conexiones cada 15 min
-    pool_timeout=30           # Segundos maximos de espera para obtener una conexion libre
+    pool_pre_ping=True,       # verifica la conexion
+    pool_size=5,              # 5 conexiones persistentes
+    max_overflow=10,          # 10 conexiones adicionales en picos de consumo
+    pool_recycle=900,         # reinicia conexiones cada 15 min
+    pool_timeout=30           # segundos maximos de espera para obtener una conexion libre
 )
 
 # crear de sesiones
