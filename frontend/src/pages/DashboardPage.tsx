@@ -62,7 +62,7 @@ export const DashboardPage: React.FC<{ prefilledCedula?: string }> = ({ prefille
   const handleQuickFill = () => {
     const mockData: Record<string, string> = {};
     requiredBiomarkers.forEach(key => {
-      mockData[key] = (Math.random() * 20 + 1).toFixed(3); // modificar para random
+      mockData[key] = (Math.random() * 18 + 1).toFixed(3); // modificar para random
     });
     setBiomarkerValues(mockData);
   };
