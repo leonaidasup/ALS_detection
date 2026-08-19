@@ -3,7 +3,7 @@ import api from '../../services/api';
 import type { TokenResponse } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { Activity, Lock, Mail, User, CreditCard } from 'lucide-react';
+import { Activity, Lock, Mail, User, CreditCard, AlertCircle, ChevronRight } from 'lucide-react';
 
 interface AuthFormProps {
   onLoginSuccess: () => void;
@@ -11,6 +11,7 @@ interface AuthFormProps {
 
 export const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     email: '',
@@ -26,10 +27,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
     try {
       if (isLogin) {
-        // Formato OAuth2PasswordRequestForm
         const params = new URLSearchParams();
         params.append('username', formData.email);
         params.append('password', formData.password);
@@ -41,7 +42,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
         localStorage.setItem('token', response.data.access_token);
         onLoginSuccess();
       } else {
-        // Registro de usuario en /users/
         await api.post('/users/', {
           email: formData.email,
           password: formData.password,
@@ -55,27 +55,74 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
       }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Ocurrió un error en la autenticación');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Fondo decorativo con resplandor suave */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-gray-950 to-gray-950 pointer-events-none" />
+
+      <div className="relative w-full max-w-md bg-gray-900 border border-gray-800/90 rounded-2xl p-8 shadow-2xl shadow-black/60">
+        
         <div className="text-center mb-6">
-          <div className="inline-flex p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 mb-3">
-            <Activity className="w-8 h-8 text-emerald-400" />
+          <div className="inline-flex items-center gap-2 mb-3">
+            <div className="p-2 bg-blue-600 rounded-lg shadow-md shadow-blue-500/20">
+              <Activity className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-bold text-gray-100">
+              ALS <b className="text-blue-400">Detection</b>
+            </span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-100">ALS Detection API</h1>
-          <p className="text-slate-400 text-xs mt-1">Plataforma de Predicción de Biomarcadores</p>
+          <p className="text-[11px] font-mono font-semibold tracking-widest text-gray-400 uppercase">
+            Plataforma Clínica
+          </p>
+          <h1 className="text-2xl font-bold text-gray-100 tracking-tight mt-1">
+            {isLogin ? 'Bienvenido de nuevo' : 'Crear cuenta'}
+          </h1>
+          <p className="text-xs text-gray-400 mt-1">
+            Herramientas de apoyo para la detección temprana de ELA.
+          </p>
         </div>
 
+        {/* Selector de pestañas Login / Registro */}
+        <div className="flex bg-gray-950 p-1 rounded-lg border border-gray-800/80 mb-6">
+          <button
+            type="button"
+            onClick={() => { setIsLogin(true); setError(''); }}
+            className={`w-1/2 py-1.5 text-xs font-semibold rounded-md transition-all ${
+              isLogin 
+                ? 'bg-gray-800 text-gray-100 shadow-sm border border-gray-700/50' 
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            Iniciar sesión
+          </button>
+          <button
+            type="button"
+            onClick={() => { setIsLogin(false); setError(''); }}
+            className={`w-1/2 py-1.5 text-xs font-semibold rounded-md transition-all ${
+              !isLogin 
+                ? 'bg-gray-800 text-gray-100 shadow-sm border border-gray-700/50' 
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            Registrarse
+          </button>
+        </div>
+
+        {/* Alerta de Error */}
         {error && (
-          <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-xs">
-            {error}
+          <div className="mb-5 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg flex items-center gap-2 text-rose-400">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <p className="text-xs font-medium">{error}</p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Formulario */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <>
               <Input
@@ -85,16 +132,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
                 required
                 value={formData.full_name}
                 onChange={handleChange}
-                placeholder="Dr. Juan Pérez"
+                placeholder="Dra. Laura Martínez"
               />
               <Input
-                label="Cédula"
+                label="Cédula Profesional / ID"
                 icon={CreditCard}
                 name="cedula"
                 required
                 value={formData.cedula}
                 onChange={handleChange}
-                placeholder="1020304050"
+                placeholder="RM-123456"
               />
             </>
           )}
@@ -107,7 +154,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
             required
             value={formData.email}
             onChange={handleChange}
-            placeholder="medico@hospital.com"
+            placeholder="nombre@hospital.com"
           />
 
           <Input
@@ -121,19 +168,27 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
             placeholder="••••••••"
           />
 
-          <Button type="submit" size="lg" className="mt-4">
-            {isLogin ? 'Iniciar Sesión' : 'Registrar Cuenta'}
+          <Button 
+            type="submit" 
+            variant="primary" 
+            size="lg"
+            isLoading={isLoading}
+            disabled={isLoading}
+            className="w-full mt-2"
+          >
+            <span>{isLogin ? 'Entrar' : 'Crear cuenta'}</span>
+            {!isLoading && <ChevronRight className="w-4 h-4" />}
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => { setIsLogin(!isLogin); setError(''); }}
-            className="text-xs text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
-          >
-            {isLogin ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión'}
-          </button>
+        {/* Nota Legal */}
+        <div className="mt-6 pt-4 border-t border-gray-800/80 text-center">
+          <p className="text-[11px] text-gray-500 leading-relaxed">
+            Al continuar confirmas que eres un profesional autorizado.<br />
+            Esta herramienta no reemplaza el criterio clínico.
+          </p>
         </div>
+
       </div>
     </div>
   );
