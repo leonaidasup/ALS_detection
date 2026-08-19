@@ -12,7 +12,7 @@ export const HistoryPage: React.FC = () => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   useEffect(() => {
-    api.get<AnalysisResponse[]>('/analysis/history').then(res => setHistory(res.data)).catch(console.error);
+    api.get<AnalysisResponse[]>('/analyses/history').then(res => setHistory(res.data)).catch(console.error);
   }, []);
 
   const filtered = history.filter(item => {

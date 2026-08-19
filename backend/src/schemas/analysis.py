@@ -5,27 +5,27 @@ from pydantic import BaseModel, ConfigDict
 
 
 class AnalysisBase(BaseModel):
-    """Esquema base de un analisis"""
-    input_data: Optional[Dict[str, Any]]
+    """Esquema base de un análisis"""
+    input_data: Optional[Dict[str, Any]] = None
 
 
-class AnalysisCreate(AnalysisBase):
-    """Esquema al registrar un nuevo analisis"""
-    patient_id: int
-    biomarkers: dict[str, float]
-    
+class AnalysisCreate(BaseModel):
+    """Esquema al registrar un nuevo análisis"""
+    patient_id: UUID 
+    biomarkers: Dict[str, float]
+
 
 class AnalysisResponse(AnalysisBase):
-    """Esquema de salida devuelto"""
-    id: UUID
-    patient_id: int
+    """Esquema de respuesta devuelto al frontend"""
+    id: int
+    patient_id: UUID
     doctor_id: int
-    input_data: dict[str, float]
+    input_data: Dict[str, float]
     prediction: str
     probability: float
-    top_biomarkers: dict[str, float] # 5 biomarcadores ordenados por magnitud de SHAP
-    all_biomarkers: dict[str, float] # biomarcadores ordenados por magnitud de SHAP
-    shap_values: dict[str, float]
+    top_biomarkers: Optional[Dict[str, float]] = None
+    all_biomarkers: Optional[Dict[str, float]] = None
+    shap_values: Dict[str, float]
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

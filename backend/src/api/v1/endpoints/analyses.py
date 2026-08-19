@@ -1,6 +1,7 @@
 from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+import numpy as np
 
 from src.core.dependencies import get_current_user
 from src.database import get_db
@@ -20,7 +21,7 @@ def create_analysis(
 ) -> Any:
     """Ejecuta la inferencia, calcula SHAP y registra el análisis clínico."""
     try:
-        label, prob, _, all_bio = ml_service.predict(analysis_in.biomarkers)
+        label, prob, top_bio, all_bio = ml_service.predict(analysis_in.biomarkers)
 
         db_analysis = Analysis(
             patient_id=analysis_in.patient_id,
@@ -33,6 +34,9 @@ def create_analysis(
         db.add(db_analysis)
         db.commit()
         db.refresh(db_analysis)
+
+        db_analysis.top_biomarkers = top_bio
+        db_analysis.all_biomarkers = all_bio
 
         return db_analysis
 
@@ -55,3 +59,8 @@ def get_analysis_history(
         .order_by(Analysis.created_at.desc())
         .all()
     )
+
+@router.get("/biomarkers", response_model=list[str])
+def get_required_biomarkers():
+    """Retorna la lista exacta de biomarcadores que requiere el pickle del modelo ML."""
+    return ml_service.required_variables
