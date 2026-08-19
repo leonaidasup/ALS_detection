@@ -1,3 +1,4 @@
+from uuid import UUID
 from datetime import datetime
 from typing import Any, Dict, Optional
 from pydantic import BaseModel, ConfigDict
@@ -16,7 +17,7 @@ class AnalysisCreate(AnalysisBase):
 
 class AnalysisResponse(AnalysisBase):
     """Esquema de salida devuelto"""
-    id: int
+    id: UUID
     patient_id: int
     doctor_id: int
     input_data: dict[str, float]

@@ -26,6 +26,8 @@ class Analysis(Base):
     # fecha de creacion
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # muchos analisis a un doctor [n: 1] y un paciente a muchos analisis [1: n]
+    # Muchos análisis pertenecen a un paciente [n: 1]
     patient = relationship("Patient", back_populates="analyses")
+
+    # Muchos análisis son realizados por un doctor [n: 1]
     doctor = relationship("User", back_populates="analyses")

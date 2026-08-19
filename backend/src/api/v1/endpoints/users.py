@@ -6,7 +6,7 @@ from src.core.dependencies import get_current_user
 from src.core.security import get_password_hash
 from src.database import get_db
 from src.models.user import User
-from src.schemas.user import UserCreate, UserResponse
+from src.schemas.user import UserCreate, UserResponse, UserUpdate
 
 router = APIRouter()
 
@@ -56,3 +56,50 @@ def read_user_me(
 ) -> Any:
     """Devuelve el perfil del usuario autenticado"""
     return current_user
+
+
+@router.put("/me", response_model=UserResponse)
+def update_user_me(
+    user_in: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Any:
+    """Actualiza la información del usuario autenticado."""
+
+    # Validar si intenta cambiar el correo a uno que ya pertenece a otro usuario
+    if user_in.email and user_in.email != current_user.email:
+        if db.query(User).filter_by(email=user_in.email).first():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El correo electrónico ya está en uso por otro usuario",
+            )
+        current_user.email = user_in.email  # type: ignore[assignment]
+
+    # Validar nombre completo si viene en la petición
+    if user_in.full_name is not None:
+        if not user_in.full_name.strip():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El nombre completo no puede estar vacío.",
+            )
+        current_user.full_name = user_in.full_name  # type: ignore[assignment]
+
+    # Si envía contraseña nueva, se encripta de nuevo
+    if user_in.password:
+        current_user.hashed_password = get_password_hash(user_in.password)  # type: ignore[assignment]
+
+    db.add(current_user)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.delete("/me", status_code=status.HTTP_200_OK)
+def delete_user_me(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Any:
+    current_user.is_active = False  # type: ignore[assignment]
+    db.add(current_user)
+    db.commit()
+    return {"message": "Cuenta desactivada exitosamente"}
