@@ -1,6 +1,6 @@
 from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 import numpy as np
 
 from src.core.dependencies import get_current_user
@@ -19,7 +19,7 @@ def create_analysis(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> Any:
-    """Ejecuta la inferencia, calcula SHAP y registra el análisis clínico."""
+    """Ejecuta la inferencia, calcula SHAP y registra el analisis clínico."""
     try:
         label, prob, top_bio, all_bio = ml_service.predict(analysis_in.biomarkers)
 
@@ -52,9 +52,10 @@ def get_analysis_history(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> Any:
-    """Retorna el historial de análisis realizados por el médico autenticado."""
+    """Retorna el historial de analisis realizados por el médico autenticado."""
     return (
         db.query(Analysis)
+        .options(joinedload(Analysis.patient))
         .filter(Analysis.doctor_id == current_user.id)
         .order_by(Analysis.created_at.desc())
         .all()

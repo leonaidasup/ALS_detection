@@ -22,13 +22,22 @@ export interface AnalysisCreate {
   biomarkers: BiomarkersDict;
 }
 
+export interface PatientShort {
+  id: string;
+  cedula: string;
+  full_name: string;
+}
+
 export interface AnalysisResponse {
   id: number;
-  patient_id: number;
-  doctor_id: string;
-  prediction: 'Positivo' | 'Negativo';
+  patient_id: string;
+  doctor_id: number;
+  patient?: PatientShort; 
+  input_data: Record<string, number>;
+  prediction: string;
   probability: number;
-  input_data: BiomarkersDict;
+  top_biomarkers?: Record<string, number>;
+  all_biomarkers?: Record<string, number>;
   shap_values: Record<string, number>;
   created_at: string;
 }

@@ -57,7 +57,7 @@ class MLService:
             X_transformed = step_obj.transform(X_transformed)
 
         classifier = self.pipeline.steps[-1][1]
-        explainer = shap.LinearExplainer(classifier, mask=np.zeros((1, X_transformed.shape[1])))
+        explainer = shap.LinearExplainer(classifier, masker=np.zeros((1, X_transformed.shape[1])))
         shap_values = explainer.shap_values(X_transformed)
 
         if isinstance(shap_values, list):
