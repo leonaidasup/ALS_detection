@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12
 
 WORKDIR /app
 
@@ -16,4 +16,4 @@ COPY . .
 # Cloud Run inyecta automáticamente la variable PORT
 ENV PORT=8080
 
-CMD exec gunicorn -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT src.main:app
+CMD exec gunicorn -w 1 -k uvicorn.workers.UvicornWorker --timeout 300 -b 0.0.0.0:$PORT src.main:app

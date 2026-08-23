@@ -56,19 +56,26 @@ class MLService:
         for _, step_obj in self.pipeline.steps[:-1]:
             X_transformed = step_obj.transform(X_transformed)
 
-        classifier = self.pipeline.steps[-1][1]
-        explainer = shap.LinearExplainer(classifier, masker=np.zeros((1, X_transformed.shape[1])))
-        shap_values = explainer.shap_values(X_transformed)
+        #classifier = self.pipeline.steps[-1][1]
+        #explainer = shap.LinearExplainer(classifier, masker=np.zeros((1, X_transformed.shape[1])))
+        #shap_values = explainer.shap_values(X_transformed)
 
-        if isinstance(shap_values, list):
-            vals = shap_values[prediction_int][0]
-        elif len(shap_values.shape) == 2:
-            vals = shap_values[0]
-        else:
-            vals = shap_values[0][:, prediction_int]
+        #if isinstance(shap_values, list):
+        #    vals = shap_values[prediction_int][0]
+        #elif len(shap_values.shape) == 2:
+        #    vals = shap_values[0]
+        #else:
+        #    vals = shap_values[0][:, prediction_int]
 
         # Mostrar biomarcadores con mayor peso
-        biomarker_impact = dict(zip(self.required_variables, vals))
+        #biomarker_impact = dict(zip(self.required_variables, vals))
+
+        classifier = self.pipeline.steps[-1][1]  # LogisticRegression
+        coefficients = classifier.coef_[0]  # Coeficientes del modelo
+        
+        # Contribución de cada feature = coeficiente * valor
+        biomarker_impact = dict(zip(self.required_variables, coefficients * feature_vector))
+    
         top_biomarkers = dict(
             sorted(
                 biomarker_impact.items(),

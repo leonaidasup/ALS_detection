@@ -9,12 +9,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_password_hash(password: str) -> str:
     """Genera un hash de la contraseña usando bcrypt"""
-    return pwd_context.hash(password)
+    return pwd_context.hash(password[:72])
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Compara una contraseña en texto plano con su hash en BD sin
      variaciones de tiempo en la comparacion, evitamos ataques de timing"""
-    return pwd_context.verify(plain_password, hashed_password)
+    return pwd_context.verify(plain_password[:72], hashed_password)
 
 def create_access_token(subject: str | Any, expires_delta: timedelta | None = None) -> str:
     """Genera un token JWT firmado codificando el ID del usuario y su tiempo de expiracion"""

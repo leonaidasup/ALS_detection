@@ -10,7 +10,8 @@ import {
   TestTube2, Loader2, 
   AlertCircle,
   RefreshCw,
-  Sparkles
+  Sparkles,
+  Upload
 } from 'lucide-react';
 
 export const DashboardPage: React.FC<{ prefilledCedula?: string }> = ({ prefilledCedula }) => {
@@ -65,6 +66,23 @@ export const DashboardPage: React.FC<{ prefilledCedula?: string }> = ({ prefille
       mockData[key] = (Math.random() * 18 + 1).toFixed(3); // modificar para random
     });
     setBiomarkerValues(mockData);
+  };
+
+  const handleLoadJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target?.result as string);
+        setBiomarkerValues(json);
+        setError('');
+      } catch (err) {
+        setError('Archivo JSON invalido');
+      }
+    };
+    reader.readAsText(file);
   };
 
   const handleRunInference = async (e: React.FormEvent) => {
@@ -200,6 +218,23 @@ export const DashboardPage: React.FC<{ prefilledCedula?: string }> = ({ prefille
                   <RefreshCw className="w-3.5 h-3.5" />
                   <span>Datos de Ejemplo</span>
                 </button>
+
+                <button
+                  onClick={() => document.getElementById('json-upload')?.click()}
+                  disabled={loadingBiomarkers}
+                  className="px-2.5 py-1.5 bg-gray-950 hover:bg-gray-800 text-green-400 border border-green-500/30 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Cargar datos</span>
+                </button>
+
+                <input
+                  id="json-upload"
+                  type="file"
+                  accept=".json"
+                  onChange={handleLoadJSON}
+                  className="hidden"
+                />
 
                 <input
                   type="text"
