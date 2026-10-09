@@ -1,6 +1,7 @@
 # ALS Detection - Diagnóstico Asistido por IA
 
 Sistema de diagnóstico de esclerosis lateral amiotrófica (ALS) usando machine learning. Aplicación full-stack con FastAPI (backend) y React (frontend) desplegada en Google Cloud Platform.
+link del modelo de I: https://colab.research.google.com/drive/1pRcxXXU9VT2l58xZX_hjYOquT3A6IgQm?usp=sharing
 
 ## 🏗️ Arquitectura
 
